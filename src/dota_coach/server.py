@@ -1,11 +1,13 @@
 """Flask server that receives Game State Integration payloads from Dota 2."""
 
+import json
 from datetime import datetime
 from typing import Any
 
 from flask import Flask, request
 
 from dota_coach.config import Config
+from dota_coach.serializer import serialize
 
 
 def create_app(config: Config) -> Flask:
@@ -36,7 +38,10 @@ def create_app(config: Config) -> Flask:
 
         print(f"[{timestamp}] POST received | state: {state} | clock: {clock}")
 
-        # The serializer will plug in here in Step 2.
+        # Serialize the raw payload into the compact coach state and show it.
+        coach_state = serialize(payload)
+        print(json.dumps(coach_state, indent=2, ensure_ascii=False))
+
         return "", 200
 
     @app.route("/", methods=["GET"])

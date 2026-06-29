@@ -16,5 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Entry point exposed as the `dota-coach` command.
 - Dota 2 GSI `.cfg` to stream the live match state to the server.
 - Project documentation (introduction, roadmap, this changelog).
+- Serializer that trims the raw GSI payload into a compact coach state
+  (clock, hero, items, abilities, economy, KDA, coarse map zone).
+- Pytest test suite covering the serializer.
 
-[Unreleased]: https://github.com/asegura-dev/dota-coach/commits/main
+### Changed
+
+- Roadmap reworked to reflect that GSI only exposes the local player's data
+  during a live match; the coach now focuses on the player's own game with
+  manually provided draft and scouting context.

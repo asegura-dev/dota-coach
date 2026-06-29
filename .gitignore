@@ -16,3 +16,6 @@ wheels/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+
+# Temporary GSI samples for development
+samples/
