@@ -9,14 +9,27 @@ from typing import Any
 
 import ollama
 
+from dota_coach import console
 from dota_coach.events import Event, EventType
+from dota_coach.heroes_data import lookup_hero
+from dota_coach.items_data import lookup_many
 
 # The coach's persona and hard rules, shared by every request.
 _SYSTEM_PROMPT = (
     "Eres un coach de Dota 2 de rango Immortal. Hablas en español, eres "
     "directo y critico, sin rodeos. Tus consejos son para el jugador local "
     "mientras juega. Responde SIEMPRE en maximo 2 frases cortas. No saludes "
-    "ni uses relleno salvo que se te pida. Ve al grano con lo accionable."
+    "ni uses relleno salvo que se te pida. Ve al grano con lo accionable.\n\n"
+    "REGLAS ESTRICTAS:\n"
+    "- Los nombres de items y habilidades van SIEMPRE en ingles exacto "
+    "(ej: 'Phase Boots', 'Force of Nature'). Nunca los traduzcas ni los "
+    "inventes.\n"
+    "- Solo menciona items y habilidades que existan de verdad en Dota 2. "
+    "Si no estas seguro del nombre, no lo uses.\n"
+    "- Mira los items que el jugador YA tiene. Nunca le recomiendes comprar "
+    "algo que ya posee.\n"
+    "- Si no tienes datos suficientes, da un consejo general en vez de "
+    "inventar nombres."
 )
 
 # Event-specific instructions. Each tells the model what to focus on.
@@ -65,10 +78,29 @@ class Brain:
         )
         state_json = json.dumps(state, ensure_ascii=False)
         extra = json.dumps(event.data, ensure_ascii=False) if event.data else "{}"
+
+        # Real data for the items the player currently holds, so the model
+        # reasons with true names, costs and effects instead of inventing them.
+        item_names = [item["name"] for item in state.get("items", [])]
+        item_data = lookup_many(item_names)
+        item_json = json.dumps(item_data, ensure_ascii=False)
+
+        # Real abilities, talents and facets for the player's hero, so the
+        # model uses true ability names instead of guessing them.
+        hero_name = state.get("hero", {}).get("name", "")
+        hero_data = lookup_hero(hero_name)
+        hero_json = json.dumps(hero_data, ensure_ascii=False) if hero_data else "{}"
+
         return (
             f"{instruction}\n\n"
             f"Estado actual del jugador (JSON): {state_json}\n"
-            f"Datos del evento: {extra}"
+            f"Datos reales de tus items actuales (nombre, costo, efecto): "
+            f"{item_json}\n"
+            f"Habilidades, talentos y facetas reales de tu heroe: {hero_json}\n"
+            f"Datos del evento: {extra}\n\n"
+            f"El jugador YA tiene los items listados arriba; no se los "
+            f"recomiendes de nuevo. Para habilidades y talentos usa SOLO los "
+            f"nombres reales listados arriba, nunca inventes. Nombres en ingles."
         )
 
     def advise(self, event: Event, state: dict[str, Any]) -> str:
@@ -83,7 +115,7 @@ class Brain:
                 ],
             )
         except Exception as error:
-            print(f"[!] Ollama error: {error}")
+            console.error(f"Ollama error: {error}")
             return ""
         content = response["message"]["content"]
         return str(content).strip()
