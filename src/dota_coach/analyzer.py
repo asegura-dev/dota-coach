@@ -15,7 +15,7 @@ _HIGH_UNSPENT_GOLD = 1000
 
 # Cooldowns in seconds, per event type. Absent means "no cooldown".
 _COOLDOWNS: dict[EventType, float] = {
-    EventType.LEVELED_UP_UNSPENT: 30.0,
+    EventType.LEVELED_UP: 30.0,
     EventType.LOW_HEALTH: 20.0,
     EventType.HIGH_UNSPENT_GOLD: 60.0,
     EventType.SCOUTING_REMINDER: 180.0,
@@ -73,17 +73,15 @@ class EventDetector:
             if was_alive and is_alive is False:
                 events.append(Event(EventType.HERO_DIED))
 
-        # Leveled up with unspent points.
-        unspent = hero.get("unspent_ability_points", 0)
-        if (
-            in_progress
-            and unspent
-            and not self._on_cooldown(EventType.LEVELED_UP_UNSPENT, clock)
-        ):
-            events.append(
-                Event(EventType.LEVELED_UP_UNSPENT, {"points": unspent})
-            )
-            self._fire(EventType.LEVELED_UP_UNSPENT, clock)
+        # Leveled up: hero level increased since the previous tick.
+        level = hero.get("level", 0)
+        if in_progress and self._prev is not None:
+            prev_level = self._prev.get("hero", {}).get("level", 0)
+            if level > prev_level and not self._on_cooldown(
+                EventType.LEVELED_UP, clock
+            ):
+                events.append(Event(EventType.LEVELED_UP, {"level": level}))
+                self._fire(EventType.LEVELED_UP, clock)
 
         # Low health: fire when crossing below the threshold; re-arm on recovery.
         hp = hero.get("health_percent")

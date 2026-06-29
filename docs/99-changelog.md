@@ -20,9 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (clock, hero, items, abilities, economy, KDA, coarse map zone).
 - Pytest test suite covering the serializer.
 - Event detector that emits events on state changes (match started, hero
-  died, level up with unspent points, low health, high unspent gold, scouting
-  reminder, starting-items check), each with its own cooldown.
+  died, level up, low health, high unspent gold, scouting reminder,
+  starting-items check), each with its own cooldown.
 - Pytest test suite covering the event detector.
+- Coaching brain that turns events into short Spanish advice via a local
+  Ollama model, configurable through `.env`.
+- Background advice worker (queue + thread) so model calls never block the
+  server or affect game performance.
+
+### Fixed
+
+- Level-up detection no longer relies on a fragile unspent-points calculation
+  that miscounted innate abilities; it now compares hero level between ticks.
 
 ### Changed
 

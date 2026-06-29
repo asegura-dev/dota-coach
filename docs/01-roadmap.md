@@ -26,18 +26,20 @@ is in Spanish, short and direct; everything in the repository is in English.
 
 3. **State detection** - _Done._
    Event detector that compares successive states and emits events (match
-   started, hero died, level up with unspent points, low health, high unspent
-   gold, periodic scouting reminder, starting-items check), each with its own
-   cooldown. It reports what changed; it does not decide what to say.
+   started, hero died, level up, low health, high unspent gold, periodic
+   scouting reminder, starting-items check), each with its own cooldown. It
+   reports what changed; it does not decide what to say.
 
 4. **Patch data extraction** - _Pending._
    Extract real item and ability data from the installed game files, so the
    model reasons with accurate costs and effects for the current patch.
 
-5. **Brain (Ollama)** - _Pending._
-   Send the clean state plus the player's context (role, hero, dictated draft)
-   to a local model. The model reasons advice for the player's situation:
-   build direction, ability order, gold needed for an item, next purchase.
+5. **Brain (Ollama)** - _Done._
+   A background worker sends each detected event and the current state to a
+   local Ollama model, which returns short Spanish advice. Runs on its own
+   thread via a queue, so it never blocks the server or the game. The model is
+   configurable via `.env`. Advice quality is limited until patch data (step 4)
+   and player context (step 6) are added.
 
 6. **Manual context input** - _Pending._
    Let the player dictate the draft and report enemy scouting, by voice or

@@ -16,6 +16,7 @@ class Config:
     auth_token: str
     host: str
     port: int
+    ollama_model: str
 
     @classmethod
     def load(cls) -> "Config":
@@ -31,4 +32,5 @@ class Config:
             auth_token=token,
             host=os.getenv("SERVER_HOST", "127.0.0.1"),
             port=int(os.getenv("SERVER_PORT", "4000")),
+            ollama_model=os.getenv("OLLAMA_MODEL", "llama3.1:8b"),
         )

@@ -91,19 +91,6 @@ def test_marks_ultimate() -> None:
     assert omni["ultimate"] is True
 
 
-def test_computes_unspent_ability_points() -> None:
-    # Hero level 7, spent levels 4 + 1 + 2 = 7, so 0 unspent.
-    result = serialize(_base_payload())
-    assert result["hero"]["unspent_ability_points"] == 0
-
-
-def test_unspent_points_when_level_exceeds_spent() -> None:
-    payload = _base_payload()
-    payload["hero"]["level"] = 8  # one more level than spent abilities
-    result = serialize(payload)
-    assert result["hero"]["unspent_ability_points"] == 1
-
-
 def test_zone_own_base_for_radiant() -> None:
     result = serialize(_base_payload())
     assert result["hero"]["zone"] == "own_base"
@@ -150,3 +137,4 @@ def test_skips_empty_ability_placeholders() -> None:
     result = serialize(payload)
     names = [ability["name"] for ability in result["abilities"]]
     assert not any(n.startswith("empty") for n in names)
+    

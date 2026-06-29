@@ -85,8 +85,8 @@ def _serialize_items(items: dict[str, Any]) -> list[dict[str, Any]]:
 def _serialize_abilities(
     abilities: dict[str, Any],
     hero_name: str,
-) -> tuple[list[dict[str, Any]], int]:
-    """Build a compact ability list and sum their levels.
+) -> list[dict[str, Any]]:
+    """Build a compact ability list.
 
     The hero name is used to strip the hero-specific prefix from each
     ability (e.g. "juggernaut_blade_fury" -> "blade_fury"). Abilities
@@ -94,17 +94,13 @@ def _serialize_abilities(
     """
     ability_prefix = f"{hero_name}_" if hero_name else ""
     result: list[dict[str, Any]] = []
-    spent_levels = 0
     for ability in abilities.values():
         name = ability.get("name")
         if not name or name.startswith("empty"):
             continue
 
-        level = ability.get("level", 0)
-        spent_levels += level
-
         clean_name = _strip(name, ability_prefix) if ability_prefix else name
-        entry: dict[str, Any] = {"name": clean_name, "level": level}
+        entry: dict[str, Any] = {"name": clean_name, "level": ability.get("level", 0)}
 
         if ability.get("ultimate"):
             entry["ultimate"] = True
@@ -114,7 +110,7 @@ def _serialize_abilities(
             entry["cooldown"] = cooldown
 
         result.append(entry)
-    return result, spent_levels
+    return result
 
 
 def serialize(payload: dict[str, Any]) -> dict[str, Any]:
@@ -126,10 +122,9 @@ def serialize(payload: dict[str, Any]) -> dict[str, Any]:
     abilities: dict[str, Any] = payload.get("abilities", {})
 
     hero_name = _strip(hero.get("name", ""), _HERO_PREFIX)
-    ability_list, spent_levels = _serialize_abilities(abilities, hero_name)
+    ability_list = _serialize_abilities(abilities, hero_name)
 
     hero_level = hero.get("level", 0)
-    unspent_points = max(0, hero_level - spent_levels)
 
     state = _strip(game_map.get("game_state", ""), _STATE_PREFIX)
     zone = _map_zone(hero.get("xpos"), hero.get("ypos"), player.get("team_name"))
@@ -150,7 +145,6 @@ def serialize(payload: dict[str, Any]) -> dict[str, Any]:
             "mana_percent": hero.get("mana_percent"),
             "has_scepter": hero.get("aghanims_scepter"),
             "has_shard": hero.get("aghanims_shard"),
-            "unspent_ability_points": unspent_points,
             "zone": zone,
         },
         "economy": {

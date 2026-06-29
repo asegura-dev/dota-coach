@@ -6,14 +6,19 @@ from typing import Any
 from flask import Flask, request
 
 from dota_coach.analyzer import EventDetector
+from dota_coach.brain import Brain
 from dota_coach.config import Config
 from dota_coach.serializer import serialize
+from dota_coach.worker import AdviceWorker
 
 
 def create_app(config: Config) -> Flask:
     """Build the Flask app. Using a factory keeps it testable."""
     app = Flask(__name__)
     detector = EventDetector()
+    brain = Brain(config.ollama_model)
+    worker = AdviceWorker(brain)
+    worker.start()
 
     def is_authentic(payload: dict[str, Any]) -> bool:
         """Check that the POST comes from your Dota using the .cfg token."""
@@ -46,6 +51,7 @@ def create_app(config: Config) -> Flask:
 
         for event in events:
             print(f"[{timestamp}] EVENT: {event.type.value} {event.data}")
+            worker.submit(event, coach_state)
 
         return "", 200
 

@@ -10,7 +10,7 @@ class EventType(StrEnum):
 
     MATCH_STARTED = "match_started"
     HERO_DIED = "hero_died"
-    LEVELED_UP_UNSPENT = "leveled_up_unspent"
+    LEVELED_UP = "leveled_up"
     LOW_HEALTH = "low_health"
     HIGH_UNSPENT_GOLD = "high_unspent_gold"
     SCOUTING_REMINDER = "scouting_reminder"

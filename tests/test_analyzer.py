@@ -11,7 +11,7 @@ def _state(
     game_state: str = "GAME_IN_PROGRESS",
     alive: bool = True,
     health_percent: int = 100,
-    unspent_points: int = 0,
+    level: int = 1,
     gold: int = 0,
 ) -> dict[str, Any]:
     """Build a minimal coach state for the detector."""
@@ -20,7 +20,7 @@ def _state(
         "hero": {
             "alive": alive,
             "health_percent": health_percent,
-            "unspent_ability_points": unspent_points,
+            "level": level,
         },
         "economy": {"gold": gold},
     }
@@ -91,10 +91,18 @@ def test_high_gold_respects_cooldown() -> None:
     assert EventType.HIGH_UNSPENT_GOLD not in _types(events)
 
 
-def test_leveled_up_unspent_fires() -> None:
+def test_leveled_up_fires_on_level_increase() -> None:
     detector = EventDetector()
-    events = detector.detect(_state(unspent_points=2), clock=0)
-    assert EventType.LEVELED_UP_UNSPENT in _types(events)
+    detector.detect(_state(level=1), clock=0)
+    events = detector.detect(_state(level=2), clock=1)
+    assert EventType.LEVELED_UP in _types(events)
+
+
+def test_no_level_up_when_level_unchanged() -> None:
+    detector = EventDetector()
+    detector.detect(_state(level=3), clock=0)
+    events = detector.detect(_state(level=3), clock=1)
+    assert EventType.LEVELED_UP not in _types(events)
 
 
 def test_scouting_reminder_is_periodic() -> None:
@@ -138,4 +146,3 @@ def test_starting_items_check_needs_a_hero() -> None:
     state["hero"]["name"] = ""
     events = detector.detect(state, clock=-80)
     assert EventType.STARTING_ITEMS_CHECK not in _types(events)
-    
