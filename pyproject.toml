@@ -7,7 +7,10 @@ authors = [
     { name = "asegura-dev", email = "Alejandro_segura85@hotmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "flask>=3.1.3",
+    "python-dotenv>=1.2.2",
+]
 
 [project.scripts]
 dota-coach = "dota_coach.__main__:main"
