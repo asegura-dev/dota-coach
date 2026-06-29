@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Serializer that trims the raw GSI payload into a compact coach state
   (clock, hero, items, abilities, economy, KDA, coarse map zone).
 - Pytest test suite covering the serializer.
+- Event detector that emits events on state changes (match started, hero
+  died, level up with unspent points, low health, high unspent gold, scouting
+  reminder, starting-items check), each with its own cooldown.
+- Pytest test suite covering the event detector.
 
 ### Changed
 

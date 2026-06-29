@@ -1,11 +1,11 @@
 """Flask server that receives Game State Integration payloads from Dota 2."""
 
-import json
 from datetime import datetime
 from typing import Any
 
 from flask import Flask, request
 
+from dota_coach.analyzer import EventDetector
 from dota_coach.config import Config
 from dota_coach.serializer import serialize
 
@@ -13,6 +13,7 @@ from dota_coach.serializer import serialize
 def create_app(config: Config) -> Flask:
     """Build the Flask app. Using a factory keeps it testable."""
     app = Flask(__name__)
+    detector = EventDetector()
 
     def is_authentic(payload: dict[str, Any]) -> bool:
         """Check that the POST comes from your Dota using the .cfg token."""
@@ -40,7 +41,11 @@ def create_app(config: Config) -> Flask:
 
         # Serialize the raw payload into the compact coach state and show it.
         coach_state = serialize(payload)
-        print(json.dumps(coach_state, indent=2, ensure_ascii=False))
+        game_clock = coach_state.get("clock") or 0
+        events = detector.detect(coach_state, game_clock)
+
+        for event in events:
+            print(f"[{timestamp}] EVENT: {event.type.value} {event.data}")
 
         return "", 200
 

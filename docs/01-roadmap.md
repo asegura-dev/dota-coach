@@ -24,10 +24,11 @@ is in Spanish, short and direct; everything in the repository is in English.
    Trim the large Valve JSON into a compact dictionary: clock, the player's
    hero, items, abilities, economy, KDA, and a coarse map zone.
 
-3. **State detection** - _Pending._
-   Trigger analysis only on relevant changes: a greeting when a new match
-   starts, and advice when something noteworthy is detected. Configurable
-   scouting reminders to check the enemy team.
+3. **State detection** - _Done._
+   Event detector that compares successive states and emits events (match
+   started, hero died, level up with unspent points, low health, high unspent
+   gold, periodic scouting reminder, starting-items check), each with its own
+   cooldown. It reports what changed; it does not decide what to say.
 
 4. **Patch data extraction** - _Pending._
    Extract real item and ability data from the installed game files, so the
