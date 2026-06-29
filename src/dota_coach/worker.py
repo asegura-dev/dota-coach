@@ -9,6 +9,7 @@ import queue
 import threading
 from typing import Any
 
+from dota_coach import console
 from dota_coach.brain import Brain
 from dota_coach.events import Event
 
@@ -35,5 +36,5 @@ class AdviceWorker:
             event, state = self._queue.get()
             advice = self._brain.advise(event, state)
             if advice:
-                print(f"COACH ({event.type.value}): {advice}")
+                console.advice(event.type.value, advice)
             self._queue.task_done()
