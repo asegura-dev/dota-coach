@@ -18,8 +18,10 @@ The detector emits these events, each with its own cooldown:
 - **match_started** - first time the game reaches in-progress (the greeting).
 - **starting_items_check** - once during pre-game, to review the opening build.
 - **hero_died** - on the alive-to-dead transition.
-- **leveled_up_unspent** - a level is available but the point is unspent.
+- **hero_kill** - the player's kill count increased.
+- **leveled_up** - hero level increased since the previous tick.
 - **low_health** - health crosses below the threshold.
+- **low_mana** - mana crosses below the threshold.
 - **high_unspent_gold** - gold accumulates above the threshold.
 - **scouting_reminder** - periodic reminder to check the enemy team.
 
@@ -30,9 +32,9 @@ The detector emits these events, each with its own cooldown:
   armed. It lives for the whole match, created once in the server.
 - **Per-event cooldowns.** Each event type has its own cooldown, so an urgent
   alert is never blocked by an unrelated informational one.
-- **Edge detection for thresholds.** Low health fires when crossing the
-  threshold downward and re-arms on recovery, so it warns on each dangerous
-  drop without nagging while the hero stays low.
+- **Edge detection for thresholds.** Low health and low mana fire when crossing
+  the threshold downward and re-arm on recovery, so they warn on each dangerous
+  drop without nagging while the value stays low.
 - **In-progress guard.** Hero events (level, health, gold) only fire during the
   live game, not in pre-game. The starting-items check is the deliberate
   exception, firing in pre-game.
@@ -41,8 +43,9 @@ The detector emits these events, each with its own cooldown:
 
 ## Tunable thresholds
 
-Low health at 20 percent, high unspent gold above 1000, scouting reminder every
-three minutes. These are starting values and are expected to be tuned.
+Low health and low mana at 20 percent, high unspent gold above 1000, scouting
+reminder every three minutes. These are starting values and are expected to be
+tuned.
 
 ## Tests
 

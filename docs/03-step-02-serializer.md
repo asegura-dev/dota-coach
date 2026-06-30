@@ -16,7 +16,7 @@ From the local player's data the serializer builds:
 
 - Clock, game state, daytime, and team scores.
 - Hero: name, level, alive, health and mana percent, scepter and shard,
-  unspent ability points, and a coarse map zone.
+  and a coarse map zone.
 - Economy: gold, GPM, XPM.
 - KDA: kills, deaths, assists, last hits, denies.
 - Items: a clean list, skipping empty slots, keeping charges and cooldowns
@@ -33,8 +33,6 @@ From the local player's data the serializer builds:
   works for any hero. Abilities without the prefix are kept as-is.
 - **Skip empty placeholders.** Empty item slots and empty ability slots (such
   as Doom's `empty1`/`empty2`) are dropped.
-- **Unspent ability points.** Computed as hero level minus the sum of ability
-  levels, enabling skill-build advice.
 - **Coarse, honest map zone.** Position is translated to `own_base`,
   `own_half`, `mid`, or `enemy_half`, based on the diagonal coordinate and the
   player's team. It does not claim lane-level precision, which would need
@@ -46,5 +44,5 @@ From the local player's data the serializer builds:
 
 The serializer is covered by a pytest suite using minimal embedded payloads,
 verifying prefix stripping, empty-slot skipping, charges and cooldowns, the
-ultimate flag, unspent ability points, the team-mirrored map zone, and graceful
-handling of sparse early-phase payloads.
+ultimate flag, the team-mirrored map zone, and graceful handling of sparse
+early-phase payloads.
