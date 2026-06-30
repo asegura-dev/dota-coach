@@ -11,8 +11,10 @@ def _state(
     game_state: str = "GAME_IN_PROGRESS",
     alive: bool = True,
     health_percent: int = 100,
+    mana_percent: int = 100,
     level: int = 1,
     gold: int = 0,
+    kills: int = 0,
 ) -> dict[str, Any]:
     """Build a minimal coach state for the detector."""
     return {
@@ -20,9 +22,11 @@ def _state(
         "hero": {
             "alive": alive,
             "health_percent": health_percent,
+            "mana_percent": mana_percent,
             "level": level,
         },
         "economy": {"gold": gold},
+        "kda": {"kills": kills},
     }
 
 
@@ -146,3 +150,49 @@ def test_starting_items_check_needs_a_hero() -> None:
     state["hero"]["name"] = ""
     events = detector.detect(state, clock=-80)
     assert EventType.STARTING_ITEMS_CHECK not in _types(events)
+
+
+def test_low_mana_fires_on_crossing() -> None:
+    detector = EventDetector()
+    detector.detect(_state(mana_percent=100), clock=0)
+    events = detector.detect(_state(mana_percent=15), clock=1)
+    assert EventType.LOW_MANA in _types(events)
+
+
+def test_low_mana_does_not_repeat_while_low() -> None:
+    detector = EventDetector()
+    detector.detect(_state(mana_percent=100), clock=0)
+    detector.detect(_state(mana_percent=15), clock=1)
+    events = detector.detect(_state(mana_percent=10), clock=5)
+    assert EventType.LOW_MANA not in _types(events)
+
+
+def test_low_mana_rearms_after_recovery() -> None:
+    detector = EventDetector()
+    detector.detect(_state(mana_percent=100), clock=0)
+    detector.detect(_state(mana_percent=15), clock=1)
+    detector.detect(_state(mana_percent=80), clock=40)  # recovered, re-armed
+    events = detector.detect(_state(mana_percent=15), clock=80)
+    assert EventType.LOW_MANA in _types(events)
+
+
+def test_hero_kill_fires_on_kill_increase() -> None:
+    detector = EventDetector()
+    detector.detect(_state(kills=0), clock=0)
+    events = detector.detect(_state(kills=1), clock=1)
+    assert EventType.HERO_KILL in _types(events)
+
+
+def test_hero_kill_respects_cooldown() -> None:
+    detector = EventDetector()
+    detector.detect(_state(kills=0), clock=0)
+    detector.detect(_state(kills=1), clock=1)
+    events = detector.detect(_state(kills=2), clock=20)  # within 45s cooldown
+    assert EventType.HERO_KILL not in _types(events)
+
+
+def test_no_kill_event_when_kills_unchanged() -> None:
+    detector = EventDetector()
+    detector.detect(_state(kills=3), clock=0)
+    events = detector.detect(_state(kills=3), clock=1)
+    assert EventType.HERO_KILL not in _types(events)

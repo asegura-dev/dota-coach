@@ -52,6 +52,12 @@ _EVENT_INSTRUCTIONS: dict[EventType, str] = {
         "El jugador acaba de morir. Da un consejo breve y concreto para no "
         "repetir el error: posicion, vision o timing."
     ),
+    EventType.HERO_KILL: (
+        "El jugador acaba de conseguir un kill. En la euforia es facil no "
+        "ver lo importante: recuerdale revisar su vida y mana, si tiene "
+        "consumibles para curarse, y que habilidades o items tiene listos "
+        "para seguir o para escapar."
+    ),
     EventType.LEVELED_UP: (
         "El jugador acaba de subir de nivel. Recuerdale gastar su punto de "
         "habilidad y sugiere cual subir segun su heroe y la fase."
@@ -59,6 +65,11 @@ _EVENT_INSTRUCTIONS: dict[EventType, str] = {
     EventType.LOW_HEALTH: (
         "El jugador tiene vida critica. Avisale con urgencia en una sola "
         "frase muy corta que se retire o use curacion."
+    ),
+    EventType.LOW_MANA: (
+        "El jugador tiene mana critico. Avisale corto que cuide su mana: "
+        "que no quede sin recursos para sus habilidades clave, o que "
+        "considere regenerar."
     ),
     EventType.HIGH_UNSPENT_GOLD: (
         "El jugador acumula oro sin gastar, lo cual es un error. Empujalo a "

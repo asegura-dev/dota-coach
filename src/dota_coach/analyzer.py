@@ -11,14 +11,17 @@ from dota_coach.events import Event, EventType
 
 # Thresholds (tunable).
 _LOW_HEALTH_PERCENT = 20
+_LOW_MANA_PERCENT = 20
 _HIGH_UNSPENT_GOLD = 1000
 
 # Cooldowns in seconds, per event type. Absent means "no cooldown".
 _COOLDOWNS: dict[EventType, float] = {
     EventType.LEVELED_UP: 30.0,
     EventType.LOW_HEALTH: 20.0,
+    EventType.LOW_MANA: 30.0,
     EventType.HIGH_UNSPENT_GOLD: 60.0,
     EventType.SCOUTING_REMINDER: 180.0,
+    EventType.HERO_KILL: 45.0,
 }
 
 
@@ -32,6 +35,7 @@ class EventDetector:
         self._last_fired: dict[EventType, float] = {}
         # Threshold events are "armed" until they fire, then re-arm on recovery.
         self._low_health_armed = True
+        self._low_mana_armed = True
 
     def _on_cooldown(self, event_type: EventType, clock: float) -> bool:
         """True if the event fired too recently to fire again."""
@@ -73,6 +77,16 @@ class EventDetector:
             if was_alive and is_alive is False:
                 events.append(Event(EventType.HERO_DIED))
 
+        # Hero kill: the player's kill count increased since the last tick.
+        if in_progress and self._prev is not None:
+            prev_kills = self._prev.get("kda", {}).get("kills") or 0
+            kills = state.get("kda", {}).get("kills") or 0
+            if kills > prev_kills and not self._on_cooldown(
+                EventType.HERO_KILL, clock
+            ):
+                events.append(Event(EventType.HERO_KILL, {"kills": kills}))
+                self._fire(EventType.HERO_KILL, clock)
+
         # Leveled up: hero level increased since the previous tick.
         level = hero.get("level", 0)
         if in_progress and self._prev is not None:
@@ -96,6 +110,20 @@ class EventDetector:
                 self._low_health_armed = False
             elif hp >= _LOW_HEALTH_PERCENT:
                 self._low_health_armed = True
+
+        # Low mana: same edge-detection logic as low health.
+        mp = hero.get("mana_percent")
+        if in_progress and mp is not None and hero.get("alive"):
+            if (
+                mp < _LOW_MANA_PERCENT
+                and self._low_mana_armed
+                and not self._on_cooldown(EventType.LOW_MANA, clock)
+            ):
+                events.append(Event(EventType.LOW_MANA, {"mana": mp}))
+                self._fire(EventType.LOW_MANA, clock)
+                self._low_mana_armed = False
+            elif mp >= _LOW_MANA_PERCENT:
+                self._low_mana_armed = True
 
         # High unspent gold.
         gold = economy.get("gold")

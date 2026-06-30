@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   item names, costs and effects.
 - Real hero ability data (abilities, talents, facets) injected into the prompt
   so advice uses true ability names instead of guessing.
+- Low-mana event with the same edge-detection logic as low health.
+- Hero-kill event (kill count increase) that reminds the player to check
+  health, mana, consumables and ready cooldowns after a kill.
 
 ### Fixed
 
