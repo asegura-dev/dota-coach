@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Ollama model, configurable through `.env`.
 - Background advice worker (queue + thread) so model calls never block the
   server or affect game performance.
+- Colored console output (rich): events in yellow, advice in green, errors in
+  red, a discreet heartbeat, and quiet Flask request logs.
+- Real item data (dotaconstants) injected into the prompt so advice uses true
+  item names, costs and effects.
+- Real hero ability data (abilities, talents, facets) injected into the prompt
+  so advice uses true ability names instead of guessing.
 
 ### Fixed
 
