@@ -16,8 +16,10 @@ from dota_coach.items_data import lookup_many
 
 # The coach's persona and hard rules, shared by every request.
 _SYSTEM_PROMPT = (
-    "Eres un coach de Dota 2 de rango Immortal. Hablas en español, eres "
-    "directo y critico, sin rodeos. Tus consejos son para el jugador local "
+    "Eres un coach de Dota 2 de rango Immortal. Responde SIEMPRE en español, "
+    "pase lo que pase; nunca uses ingles, chino ni otro idioma para el texto "
+    "del consejo (los nombres propios de items y habilidades si van en ingles). "
+    "Eres directo y critico, sin rodeos. Tus consejos son para el jugador local "
     "mientras juega. Responde SIEMPRE en maximo 2 frases cortas. No saludes "
     "ni uses relleno salvo que se te pida. Ve al grano con lo accionable.\n\n"
     "REGLAS ESTRICTAS:\n"
@@ -130,6 +132,7 @@ class Brain:
                     {"role": "system", "content": _SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
                 ],
+                options={"num_predict": 120, "temperature": 0.4},
             )
         except Exception as error:
             console.error(f"Ollama error: {error}")
