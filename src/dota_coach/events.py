@@ -9,6 +9,7 @@ class EventType(StrEnum):
     """Types of noteworthy events the analyzer can detect."""
 
     MATCH_STARTED = "match_started"
+    STRATEGY_TIME = "strategy_time"
     HERO_DIED = "hero_died"
     HERO_KILL = "hero_kill"
     LEVELED_UP = "leveled_up"

@@ -196,3 +196,11 @@ def test_no_kill_event_when_kills_unchanged() -> None:
     detector.detect(_state(kills=3), clock=0)
     events = detector.detect(_state(kills=3), clock=1)
     assert EventType.HERO_KILL not in _types(events)
+
+
+def test_strategy_time_fires_once() -> None:
+    detector = EventDetector()
+    first = detector.detect(_state(game_state="STRATEGY_TIME"), clock=-29)
+    second = detector.detect(_state(game_state="STRATEGY_TIME"), clock=-28)
+    assert EventType.STRATEGY_TIME in _types(first)
+    assert EventType.STRATEGY_TIME not in _types(second)

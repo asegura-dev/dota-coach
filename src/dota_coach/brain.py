@@ -35,6 +35,10 @@ _SYSTEM_PROMPT = (
     "suben hasta nivel 4 como maximo. El ultimate sube hasta nivel 3 como "
     "maximo y solo en los niveles de heroe 6, 12 y 18. Nunca sugieras subir "
     "una habilidad por encima de su maximo.\n"
+    "- El estado incluye el nivel actual de cada habilidad del jugador. "
+    "Mira ese nivel antes de aconsejar: sugiere subir una habilidad al "
+    "nivel SIGUIENTE (actual + 1), nunca a un nivel que ya tiene o menor. "
+    "Si una habilidad ya esta al maximo, sugiere otra.\n"
     "- Los talentos se eligen solo en los niveles de heroe 10, 15, 20 y 25.\n"
     "- Si no tienes datos suficientes, da un consejo general en vez de "
     "inventar nombres."
@@ -42,6 +46,11 @@ _SYSTEM_PROMPT = (
 
 # Event-specific instructions. Each tells the model what to focus on.
 _EVENT_INSTRUCTIONS: dict[EventType, str] = {
+    EventType.STRATEGY_TIME: (
+        "Termino la seleccion de heroes y empieza la fase de estrategia. "
+        "Saluda corto y di que estas listo para planear. Si no conoces el "
+        "draft enemigo aun, pide que te lo indiquen."
+    ),
     EventType.MATCH_STARTED: (
         "La partida acaba de empezar. Saluda en una frase y di que estas "
         "listo para asistir. Breve y con energia."

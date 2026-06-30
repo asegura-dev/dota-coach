@@ -31,6 +31,7 @@ class EventDetector:
     def __init__(self) -> None:
         self._prev: dict[str, Any] | None = None
         self._match_started_fired = False
+        self._strategy_time_fired = False
         self._starting_items_fired = False
         self._last_fired: dict[EventType, float] = {}
         # Threshold events are "armed" until they fire, then re-arm on recovery.
@@ -55,6 +56,19 @@ class EventDetector:
         hero = state.get("hero", {})
         economy = state.get("economy", {})
         in_progress = state.get("game_state") == "GAME_IN_PROGRESS"
+
+        # Strategy time: fire once when the draft closes and strategy begins.
+        if (
+            not self._strategy_time_fired
+            and state.get("game_state") == "STRATEGY_TIME"
+        ):
+            events.append(Event(EventType.STRATEGY_TIME))
+            self._strategy_time_fired = True
+
+        # Match started: fire once when we first see an in-progress game.
+        if not self._match_started_fired and in_progress:
+            events.append(Event(EventType.MATCH_STARTED))
+            self._match_started_fired = True
 
         # Match started: fire once when we first see an in-progress game.
         if not self._match_started_fired and in_progress:
