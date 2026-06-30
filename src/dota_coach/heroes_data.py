@@ -6,6 +6,7 @@ does). Exposes only what the coach needs, with real in-game names.
 """
 
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,14 @@ def _ability_detail(ability_name: str) -> dict[str, Any] | None:
     }
 
 
+def _clean_talent_name(name: str) -> str:
+    """Remove unfilled dotaconstants placeholders like {s:bonus_x} from a name."""
+    cleaned = re.sub(r"\{[^}]*\}", "", name)
+    # Collapse leftover double spaces and stray signs from removed numbers.
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned
+
+
 def lookup_hero(hero_name: str) -> dict[str, Any] | None:
     """Return a hero's real abilities, talents and facets, or None.
 
@@ -83,14 +92,15 @@ def lookup_hero(hero_name: str) -> dict[str, Any] | None:
             }
         )
 
-    # Talents: level and readable name where available.
+    # Talents: level and readable name, with unfilled placeholders removed.
     talents: list[dict[str, Any]] = []
     for talent in hero.get("talents", []):
         detail = _ability_detail(talent.get("name", ""))
+        raw_name = detail["name"] if detail else talent.get("name", "")
         talents.append(
             {
                 "level": talent.get("level"),
-                "name": detail["name"] if detail else talent.get("name"),
+                "name": _clean_talent_name(raw_name),
             }
         )
 
