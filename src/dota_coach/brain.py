@@ -10,6 +10,7 @@ from typing import Any
 import ollama
 
 from dota_coach import console
+from dota_coach.context import load_context
 from dota_coach.events import Event, EventType
 from dota_coach.heroes_data import lookup_hero
 from dota_coach.items_data import lookup_many
@@ -42,6 +43,10 @@ _SYSTEM_PROMPT = (
     "- Los talentos se eligen solo en los niveles de heroe 10, 15, 20 y 25.\n"
     "- Si no tienes datos suficientes, da un consejo general en vez de "
     "inventar nombres."
+    "- Usa el contexto de la partida (rol, aliados, enemigos) cuando este "
+    "disponible: adapta el consejo a tu rol (un support y un carry juegan "
+    "distinto) y a los heroes enemigos. Si el contexto esta vacio, aconseja "
+    "de forma general y puedes pedir que te indiquen el draft.\n"
 )
 
 # Event-specific instructions. Each tells the model what to focus on.
@@ -145,6 +150,11 @@ class Brain:
         skills = _skill_status(state.get("abilities", []))
         skills_json = json.dumps(skills, ensure_ascii=False)
 
+        # Manual context the player provides (role and draft), which GSI
+        # cannot give us. Read fresh so mid-match edits take effect.
+        context = load_context()
+        context_json = json.dumps(context, ensure_ascii=False)
+
         return (
             f"{instruction}\n\n"
             f"Estado actual del jugador (JSON): {state_json}\n"
@@ -154,6 +164,8 @@ class Brain:
             f"Nivel actual de tus habilidades y cuales puedes subir "
             f"(can_level=true significa que aun no esta al maximo): "
             f"{skills_json}\n"
+            f"Contexto de la partida que te dio el jugador (tu rol, aliados "
+            f"y enemigos; GSI no da esto): {context_json}\n"
             f"Datos del evento: {extra}\n\n"
             f"El jugador YA tiene los items listados arriba; no se los "
             f"recomiendes de nuevo. Para habilidades y talentos usa SOLO los "

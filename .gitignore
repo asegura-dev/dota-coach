@@ -19,3 +19,6 @@ wheels/
 
 # Temporary GSI samples for development
 samples/
+
+# Test without play dota
+context.json
