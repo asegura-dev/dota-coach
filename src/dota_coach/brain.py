@@ -35,10 +35,10 @@ _SYSTEM_PROMPT = (
     "suben hasta nivel 4 como maximo. El ultimate sube hasta nivel 3 como "
     "maximo y solo en los niveles de heroe 6, 12 y 18. Nunca sugieras subir "
     "una habilidad por encima de su maximo.\n"
-    "- El estado incluye el nivel actual de cada habilidad del jugador. "
-    "Mira ese nivel antes de aconsejar: sugiere subir una habilidad al "
-    "nivel SIGUIENTE (actual + 1), nunca a un nivel que ya tiene o menor. "
-    "Si una habilidad ya esta al maximo, sugiere otra.\n"
+    "- Para subir habilidades, usa la lista de habilidades del jugador con "
+    "can_level: solo sugiere subir habilidades con can_level=true, y nombra "
+    "el nivel siguiente (level + 1). Nunca sugieras una con can_level=false "
+    "ni un nivel mayor a su max.\n"
     "- Los talentos se eligen solo en los niveles de heroe 10, 15, 20 y 25.\n"
     "- Si no tienes datos suficientes, da un consejo general en vez de "
     "inventar nombres."
@@ -93,6 +93,27 @@ _EVENT_INSTRUCTIONS: dict[EventType, str] = {
 }
 
 
+def _skill_status(abilities: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Annotate each player ability with its cap and whether it can be leveled.
+
+    Normal abilities cap at 4, ultimates at 3. This is computed in code so the
+    model does not have to reason about level limits (which it does poorly).
+    """
+    result: list[dict[str, Any]] = []
+    for ability in abilities:
+        level = ability.get("level", 0)
+        cap = 3 if ability.get("ultimate") else 4
+        result.append(
+            {
+                "name": ability.get("name"),
+                "level": level,
+                "max": cap,
+                "can_level": level < cap,
+            }
+        )
+    return result
+
+
 class Brain:
     """Generates coaching advice from events using a local Ollama model."""
 
@@ -119,12 +140,20 @@ class Brain:
         hero_data = lookup_hero(hero_name)
         hero_json = json.dumps(hero_data, ensure_ascii=False) if hero_data else "{}"
 
+        # The player's current abilities with level caps and what can be leveled,
+        # computed in code so the model does not misjudge level limits.
+        skills = _skill_status(state.get("abilities", []))
+        skills_json = json.dumps(skills, ensure_ascii=False)
+
         return (
             f"{instruction}\n\n"
             f"Estado actual del jugador (JSON): {state_json}\n"
             f"Datos reales de tus items actuales (nombre, costo, efecto): "
             f"{item_json}\n"
             f"Habilidades, talentos y facetas reales de tu heroe: {hero_json}\n"
+            f"Nivel actual de tus habilidades y cuales puedes subir "
+            f"(can_level=true significa que aun no esta al maximo): "
+            f"{skills_json}\n"
             f"Datos del evento: {extra}\n\n"
             f"El jugador YA tiene los items listados arriba; no se los "
             f"recomiendes de nuevo. Para habilidades y talentos usa SOLO los "
