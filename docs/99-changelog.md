@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Low-mana event with the same edge-detection logic as low health.
 - Hero-kill event (kill count increase) that reminds the player to check
   health, mana, consumables and ready cooldowns after a kill.
+- Manual match context: the coach reads role and draft from `context.json`.
+- Context GUI (`dota-context`) with hero search to write the context file.
+- Strategy-time event so the coach wakes up when the draft closes.
 
 ### Fixed
 

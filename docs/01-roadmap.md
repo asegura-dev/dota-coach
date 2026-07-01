@@ -43,9 +43,10 @@ is in Spanish, short and direct; everything in the repository is in English.
    configurable via `.env`. Advice quality is limited until patch data (step 4)
    and player context (step 6) are added.
 
-6. **Manual context input** - _Pending._
-   Let the player dictate the draft and report enemy scouting, by voice or
-   text. The architecture supports both input methods.
+6. **Manual context input** - _Done (text)._
+   The player supplies their role and the draft through a small GUI that writes
+   `context.json`, which the coach reads into its prompt. Decoupled by file, so
+   a voice input can be added later as another writer. Voice itself is pending.
 
 7. **Audio (TTS)** - _Pending._
    Speak the advice from a queue on a background thread, without affecting
