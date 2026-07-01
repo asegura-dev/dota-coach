@@ -8,6 +8,7 @@ information instead of inventing it.
 - `items.json` — item names, costs, and effects.
 - `hero_abilities.json` — each hero's abilities, talents, and facets.
 - `abilities.json` — per-ability details (name, description, cooldown, mana).
+- `heroes.json` — hero list with localized names and base stats.
 
 ## Source and attribution
 
