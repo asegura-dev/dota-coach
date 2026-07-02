@@ -95,19 +95,24 @@ _EVENT_INSTRUCTIONS: dict[EventType, str] = {
 }
 
 
-def _skill_status(abilities: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _skill_status(
+    abilities: list[dict[str, Any]], display_names: dict[str, str]
+) -> list[dict[str, Any]]:
     """Annotate each player ability with its cap and whether it can be leveled.
 
     Normal abilities cap at 4, ultimates at 3. This is computed in code so the
     model does not have to reason about level limits (which it does poorly).
+    The internal name is mapped to its display name so the model never sees
+    raw keys like "voodoo_restoration".
     """
     result: list[dict[str, Any]] = []
     for ability in abilities:
+        raw = ability.get("name", "")
         level = ability.get("level", 0)
         cap = 3 if ability.get("ultimate") else 4
         result.append(
             {
-                "name": ability.get("name"),
+                "name": display_names.get(raw, raw),
                 "level": level,
                 "max": cap,
                 "can_level": level < cap,
@@ -140,19 +145,28 @@ class Brain:
         # model uses true ability names instead of guessing them.
         hero_name = state.get("hero", {}).get("name", "")
         hero_data = lookup_hero(hero_name)
+        # Map internal ability keys to display names before dropping the key,
+        # so skill status can show "Voodoo Restoration" instead of the raw key.
+        display_names = {
+            a.get("key", ""): a.get("name", "")
+            for a in (hero_data["abilities"] if hero_data else [])
+        }
         if hero_data:
             # Keep only abilities the player actually has in the live state, so
             # item-granted ones (Aghanim's Shard/Scepter) the player has not
             # bought are never shown and cannot be suggested to level.
             owned = {a.get("name") for a in state.get("abilities", [])}
             hero_data["abilities"] = [
-                a for a in hero_data["abilities"] if a.get("key") in owned
+                {k: v for k, v in a.items() if k != "key"}
+                for a in hero_data["abilities"]
+                if a.get("key") in owned
             ]
         hero_json = json.dumps(hero_data, ensure_ascii=False) if hero_data else "{}"
 
         # The player's current abilities with level caps and what can be leveled,
-        # computed in code so the model does not misjudge level limits.
-        skills = _skill_status(state.get("abilities", []))
+        # computed in code so the model does not misjudge level limits. Names are
+        # mapped to display form so the model never sees raw internal keys.
+        skills = _skill_status(state.get("abilities", []), display_names)
         skills_json = json.dumps(skills, ensure_ascii=False)
 
         # Manual context the player provides (role and draft), which GSI
