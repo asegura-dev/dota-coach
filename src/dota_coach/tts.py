@@ -46,20 +46,23 @@ class Speaker:
     def _run(self) -> None:
         """Consume the queue and speak each line.
 
-        The engine is created inside the thread because pyttsx3 is not safe to
-        share across threads. Each line is spoken to completion before the next.
+        A fresh engine is created for each line. Reusing a single pyttsx3
+        engine with runAndWait in a loop leaves SAPI in a dead state after the
+        first call on Windows, so the coach would fall silent after one line.
+        Creating it per line is slightly slower but reliable.
         """
-        engine = pyttsx3.init()
-        voice_id = _pick_voice(engine)
-        if voice_id:
-            engine.setProperty("voice", voice_id)
-        engine.setProperty("rate", 170)  # a touch faster than default
-
         while True:
             text = self._queue.get()
             try:
+                engine = pyttsx3.init()
+                voice_id = _pick_voice(engine)
+                if voice_id:
+                    engine.setProperty("voice", voice_id)
+                engine.setProperty("rate", 170)
                 engine.say(text)
                 engine.runAndWait()
+                engine.stop()
+                del engine
             except Exception:
                 # A speech failure should never crash the coach.
                 pass
