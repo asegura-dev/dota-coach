@@ -22,3 +22,6 @@ samples/
 
 # Test without play dota
 context.json
+
+# Voices 
+voices/
