@@ -39,14 +39,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manual match context: the coach reads role and draft from `context.json`.
 - Context GUI (`dota-context`) with hero search to write the context file.
 - Strategy-time event so the coach wakes up when the draft closes.
+- Batch script (`start.bat`) that launches the coach and context GUI together.
 
 ### Fixed
 
-- Level-up detection no longer relies on a fragile unspent-points calculation
-  that miscounted innate abilities; it now compares hero level between ticks.
+- Level-up advice no longer suggests item-granted abilities (Aghanim's Shard or
+  Scepter) the player does not own, by filtering hero abilities to those present
+  in the live state.
 
 ### Changed
 
 - Roadmap reworked to reflect that GSI only exposes the local player's data
   during a live match; the coach now focuses on the player's own game with
   manually provided draft and scouting context.
+- The coach now replies in neutral Mexican Spanish, avoiding Iberian idioms.

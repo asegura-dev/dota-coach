@@ -29,6 +29,9 @@ short, direct message in Spanish.
   an empty string instead of crashing the server.
 - **Console first.** Advice is printed to the console for now. Speaking it aloud
   (text-to-speech) is a later step; swapping print for speech will be trivial.
+- **Only real abilities.** The hero's ability list is filtered to those the
+  player currently has in the live state, so item-granted abilities (Aghanim's
+  Shard or Scepter) are never suggested for leveling until actually acquired.
 
 ## Current limitation
 
