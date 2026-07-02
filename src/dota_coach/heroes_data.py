@@ -48,6 +48,7 @@ def _ability_detail(ability_name: str) -> dict[str, Any] | None:
         "effect": desc[:200],
         "cooldown": ability.get("cd"),
         "mana": ability.get("mc"),
+        "is_innate": bool(ability.get("is_innate")),
     }
 
 
@@ -73,18 +74,19 @@ def lookup_hero(hero_name: str) -> dict[str, Any] | None:
     if hero is None:
         return None
 
-    # Real, described abilities (skip talents, which start with special_bonus).
-    # Each keeps its clean internal key so callers can match it against the
-    # abilities the player actually has in the live state.
+    # Real, described abilities (skip talents and innate abilities, which are
+    # not leveled with skill points). Each keeps its clean internal key so
+    # callers can match it against the abilities the player has in the state.
     hero_prefix = f"{hero_name}_"
     abilities: list[dict[str, Any]] = []
     for ability_name in hero.get("abilities", []):
         if ability_name.startswith("special_bonus"):
             continue
         detail = _ability_detail(ability_name)
-        if detail is not None:
-            detail["key"] = ability_name.replace(hero_prefix, "")
-            abilities.append(detail)
+        if detail is None or detail.get("is_innate"):
+            continue
+        detail["key"] = ability_name.replace(hero_prefix, "")
+        abilities.append(detail)
 
     # Facets: name and short description.
     facets: list[dict[str, Any]] = []
