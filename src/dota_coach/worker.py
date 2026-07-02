@@ -12,6 +12,7 @@ from typing import Any
 from dota_coach import console
 from dota_coach.brain import Brain
 from dota_coach.events import Event
+from dota_coach.tts import Speaker
 
 
 class AdviceWorker:
@@ -19,6 +20,7 @@ class AdviceWorker:
 
     def __init__(self, brain: Brain) -> None:
         self._brain = brain
+        self._speaker = Speaker()
         self._queue: queue.Queue[tuple[Event, dict[str, Any]]] = queue.Queue()
         self._thread = threading.Thread(target=self._run, daemon=True)
 
@@ -37,4 +39,5 @@ class AdviceWorker:
             advice = self._brain.advise(event, state)
             if advice:
                 console.advice(event.type.value, advice)
+                self._speaker.say(advice)
             self._queue.task_done()
