@@ -74,12 +74,16 @@ def lookup_hero(hero_name: str) -> dict[str, Any] | None:
         return None
 
     # Real, described abilities (skip talents, which start with special_bonus).
+    # Each keeps its clean internal key so callers can match it against the
+    # abilities the player actually has in the live state.
+    hero_prefix = f"{hero_name}_"
     abilities: list[dict[str, Any]] = []
     for ability_name in hero.get("abilities", []):
         if ability_name.startswith("special_bonus"):
             continue
         detail = _ability_detail(ability_name)
         if detail is not None:
+            detail["key"] = ability_name.replace(hero_prefix, "")
             abilities.append(detail)
 
     # Facets: name and short description.

@@ -144,6 +144,14 @@ class Brain:
         # model uses true ability names instead of guessing them.
         hero_name = state.get("hero", {}).get("name", "")
         hero_data = lookup_hero(hero_name)
+        if hero_data:
+            # Keep only abilities the player actually has in the live state, so
+            # item-granted ones (Aghanim's Shard/Scepter) the player has not
+            # bought are never shown and cannot be suggested to level.
+            owned = {a.get("name") for a in state.get("abilities", [])}
+            hero_data["abilities"] = [
+                a for a in hero_data["abilities"] if a.get("key") in owned
+            ]
         hero_json = json.dumps(hero_data, ensure_ascii=False) if hero_data else "{}"
 
         # The player's current abilities with level caps and what can be leveled,
