@@ -517,14 +517,14 @@ through Ollama. It is the first step where the coach actually talks.</p>
 <h2 id="doc6--why-it-matters">Why it matters</h2>
 <p>Steps 1 to 3 decide <em>when</em> to react. The brain decides <em>what to say</em>. It takes
 an event and the current state, asks a local model for advice, and returns a
-short, direct message in Spanish.</p>
+short, direct message in English.</p>
 <h2 id="doc6--how-it-works">How it works</h2>
 <ul>
 <li><strong>Local model via Ollama.</strong> The brain calls a model running locally (default
 <code>llama3.1:8b</code>, configurable in <code>.env</code>). Running locally keeps it private and
 free, and the machine's GPU keeps responses fast.</li>
 <li><strong>Event-specific prompts.</strong> A shared system prompt sets the coach persona
-(Immortal-level, Spanish, two sentences, direct). Each event type adds its own
+(Immortal-level, English, two sentences, direct). Each event type adds its own
 instruction, so a death, a level-up, or low health each get focused advice.</li>
 <li><strong>Background worker.</strong> Calls to the model take seconds, so they run on a
 separate thread fed by a queue. The server enqueues an event and returns
@@ -654,15 +654,15 @@ game. When the advice worker produces a line, it prints it and also hands it to
 the speaker, which says it aloud. Lines are spoken one after another, so several
 events in a fight do not overlap.</p>
 <p>The engine is Piper, a local neural text-to-speech system. It runs offline (no
-internet, no cost) and uses a Mexican Spanish voice, so the advice sounds
+internet, no cost) and uses an English voice, so the advice sounds
 natural and native. The engine sits behind <code>Speaker</code>, so it can be swapped
 without touching the rest of the coach; an earlier version used the built-in
 Windows voice.</p>
 <h2 id="doc9--the-voice-model">The voice model</h2>
 <p>Piper needs a voice model (two files, <code>.onnx</code> and <code>.onnx.json</code>). These are not
 committed to the repository, since they are large and downloadable. They live
-in a <code>voices/</code> folder, which is git-ignored. To fetch the Mexican voice:</p>
-<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="copy-btn" type="button" aria-label="Copy code">Copy</button></div><pre><code>uv run python -m piper.download_voices es_MX-ald-medium
+in a <code>voices/</code> folder, which is git-ignored. To fetch the English voice:</p>
+<div class="code-block"><div class="code-head"><span class="code-lang">text</span><button class="copy-btn" type="button" aria-label="Copy code">Copy</button></div><pre><code>uv run python -m piper.download_voices en_US-lessac-high
 </code></pre></div>
 <p>Then move the two downloaded files into <code>voices/</code>. Speech rate is tuned with
 <code>length_scale</code> in <code>tts.py</code> (lower is faster).</p>
@@ -713,6 +713,9 @@ health, mana, consumables and ready cooldowns after a kill.</li>
 <li>Strategy-time event so the coach wakes up when the draft closes.</li>
 <li>Batch script (<code>start.bat</code>) that launches the coach and context GUI together.</li>
 <li>Spoken advice via Piper text-to-speech with a Mexican Spanish voice.</li>
+<li>The coach now thinks and replies in English, which removed the language
+drift to Chinese and improved instruction-following on the local model.</li>
+<li>Switched the voice to an English Piper voice (en_US-lessac-high).</li>
 </ul>
 <h3 id="doc10--fixed">Fixed</h3>
 <ul>

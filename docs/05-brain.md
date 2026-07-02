@@ -7,7 +7,7 @@ through Ollama. It is the first step where the coach actually talks.
 
 Steps 1 to 3 decide *when* to react. The brain decides *what to say*. It takes
 an event and the current state, asks a local model for advice, and returns a
-short, direct message in Spanish.
+short, direct message in English.
 
 ## How it works
 
@@ -15,7 +15,7 @@ short, direct message in Spanish.
   `llama3.1:8b`, configurable in `.env`). Running locally keeps it private and
   free, and the machine's GPU keeps responses fast.
 - **Event-specific prompts.** A shared system prompt sets the coach persona
-  (Immortal-level, Spanish, two sentences, direct). Each event type adds its own
+  (Immortal-level, English, two sentences, direct). Each event type adds its own
   instruction, so a death, a level-up, or low health each get focused advice.
 - **Background worker.** Calls to the model take seconds, so they run on a
   separate thread fed by a queue. The server enqueues an event and returns

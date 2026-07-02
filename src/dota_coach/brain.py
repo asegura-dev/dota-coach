@@ -1,7 +1,7 @@
 """The coaching brain: turns detected events into spoken advice via Ollama.
 
 It builds an event-specific prompt, sends it to a local Ollama model along
-with the current game state, and returns short, direct advice in Spanish.
+with the current game state, and returns short, direct advice in English.
 """
 
 import json

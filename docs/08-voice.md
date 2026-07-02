@@ -17,7 +17,7 @@ the speaker, which says it aloud. Lines are spoken one after another, so several
 events in a fight do not overlap.
 
 The engine is Piper, a local neural text-to-speech system. It runs offline (no
-internet, no cost) and uses a Mexican Spanish voice, so the advice sounds
+internet, no cost) and uses an English voice, so the advice sounds
 natural and native. The engine sits behind `Speaker`, so it can be swapped
 without touching the rest of the coach; an earlier version used the built-in
 Windows voice.
@@ -26,9 +26,9 @@ Windows voice.
 
 Piper needs a voice model (two files, `.onnx` and `.onnx.json`). These are not
 committed to the repository, since they are large and downloadable. They live
-in a `voices/` folder, which is git-ignored. To fetch the Mexican voice:
+in a `voices/` folder, which is git-ignored. To fetch the English voice:
 ```
-uv run python -m piper.download_voices es_MX-ald-medium
+uv run python -m piper.download_voices en_US-lessac-high
 ```
 Then move the two downloaded files into `voices/`. Speech rate is tuned with
 `length_scale` in `tts.py` (lower is faster).

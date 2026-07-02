@@ -41,6 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy-time event so the coach wakes up when the draft closes.
 - Batch script (`start.bat`) that launches the coach and context GUI together.
 - Spoken advice via Piper text-to-speech with a Mexican Spanish voice.
+- The coach now thinks and replies in English, which removed the language
+  drift to Chinese and improved instruction-following on the local model.
+- Switched the voice to an English Piper voice (en_US-lessac-high).
 
 ### Fixed
 
