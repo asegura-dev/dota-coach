@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Context GUI (`dota-context`) with hero search to write the context file.
 - Strategy-time event so the coach wakes up when the draft closes.
 - Batch script (`start.bat`) that launches the coach and context GUI together.
+- Spoken advice via Piper text-to-speech with a Mexican Spanish voice.
 
 ### Fixed
 

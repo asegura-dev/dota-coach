@@ -48,7 +48,7 @@ is in Spanish, short and direct; everything in the repository is in English.
    `context.json`, which the coach reads into its prompt. Decoupled by file, so
    a voice input can be added later as another writer. Voice itself is pending.
 
-7. **Audio (TTS)** - _Pending._
+7. **Audio (TTS)** - _Done._
    Speak the advice from a queue on a background thread, without affecting
    frame rate.
 
