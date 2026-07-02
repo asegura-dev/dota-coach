@@ -13,7 +13,7 @@ from pathlib import Path
 import sounddevice as sd
 from piper import PiperVoice, SynthesisConfig
 
-_VOICE_PATH = Path(__file__).resolve().parents[2] / "voices" / "es_MX-ald-medium.onnx"
+_VOICE_PATH = Path(__file__).resolve().parents[2] / "voices" / "en_US-lessac-high.onnx"
 
 
 class Speaker:
@@ -51,7 +51,7 @@ class Speaker:
 
         parts = []
         sample_rate = 22050
-        syn_config = SynthesisConfig(length_scale=0.65)
+        syn_config = SynthesisConfig(length_scale=0.85)
         for chunk in voice.synthesize(text, syn_config=syn_config):
             parts.append(chunk.audio_float_array)
             sample_rate = chunk.sample_rate
