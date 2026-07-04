@@ -14,6 +14,7 @@ from dota_coach.context import load_context
 from dota_coach.events import Event, EventType
 from dota_coach.heroes_data import lookup_hero
 from dota_coach.items_data import lookup_many
+from dota_coach.memory import AdviceMemory
 
 # The coach's persona and hard rules, shared by every request.
 _SYSTEM_PROMPT = (
@@ -126,6 +127,7 @@ class Brain:
 
     def __init__(self, model: str) -> None:
         self._model = model
+        self._memory = AdviceMemory()
 
     def _build_prompt(self, event: Event, state: dict[str, Any]) -> str:
         """Compose the user prompt from the event and the current state."""
@@ -151,6 +153,7 @@ class Brain:
             a.get("key", ""): a.get("name", "")
             for a in (hero_data["abilities"] if hero_data else [])
         }
+        self._last_display_names = display_names
         if hero_data:
             # Keep only abilities the player actually has in the live state, so
             # item-granted ones (Aghanim's Shard/Scepter) the player has not
@@ -174,6 +177,15 @@ class Brain:
         context = load_context()
         context_json = json.dumps(context, ensure_ascii=False)
 
+        # Advice the player already acted on, so the model stops repeating it.
+        acted = self._memory.fulfilled(state, display_names)
+        acted_line = (
+            f"You already advised these and the player acted on them; do not "
+            f"repeat them, move on: {', '.join(acted)}.\n"
+            if acted
+            else ""
+        )
+
         return (
             f"{instruction}\n\n"
             f"Current player state (JSON): {state_json}\n"
@@ -188,6 +200,7 @@ class Brain:
             f"Match context the player gave you (your role, allies and "
             f"enemies; GSI does not provide this): {context_json}\n"
             f"Event data: {extra}\n\n"
+            f"{acted_line}"
             f"The player ALREADY has the items listed above; do not recommend "
             f"them again. For abilities and talents use ONLY the real names "
             f"listed above, never invent. Reply in English."
@@ -208,5 +221,6 @@ class Brain:
         except Exception as error:
             console.error(f"Ollama error: {error}")
             return ""
-        content = response["message"]["content"]
-        return str(content).strip()
+        advice = str(response["message"]["content"]).strip()
+        self._memory.record(advice, state, self._last_display_names)
+        return advice
