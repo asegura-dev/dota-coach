@@ -59,3 +59,20 @@ def lookup_many(names: list[str]) -> list[dict[str, Any]]:
         if data is not None:
             result.append(data)
     return result
+
+
+@lru_cache(maxsize=1)
+def item_name_map() -> dict[str, str]:
+    """Return a map of display name -> internal name for all real items.
+
+    Lets callers detect any item the coach might mention by its display name
+    (e.g. "Blink Dagger") and tie it back to the internal name ("blink") the
+    live state uses, even for items the player does not own yet.
+    """
+    items = _load_items()
+    result: dict[str, str] = {}
+    for internal, data in items.items():
+        dname = data.get("dname")
+        if dname:
+            result[dname] = internal
+    return result

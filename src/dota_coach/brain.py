@@ -13,7 +13,7 @@ from dota_coach import console
 from dota_coach.context import load_context
 from dota_coach.events import Event, EventType
 from dota_coach.heroes_data import lookup_hero
-from dota_coach.items_data import lookup_many
+from dota_coach.items_data import item_name_map, lookup_many
 from dota_coach.memory import AdviceMemory
 
 # The coach's persona and hard rules, shared by every request.
@@ -153,6 +153,10 @@ class Brain:
             a.get("key", ""): a.get("name", "")
             for a in (hero_data["abilities"] if hero_data else [])
         }
+        # Add items (internal -> display) so the memory can also detect item
+        # advice. item_name_map is display -> internal, so invert it.
+        for display, internal in item_name_map().items():
+            display_names.setdefault(internal, display)
         self._last_display_names = display_names
         if hero_data:
             # Keep only abilities the player actually has in the live state, so
