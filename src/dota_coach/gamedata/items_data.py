@@ -11,7 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-_ITEMS_PATH = Path(__file__).resolve().parents[2] / "data" / "items.json"
+_ITEMS_PATH = Path(__file__).resolve().parents[3] / "data" / "items.json"
 
 
 @lru_cache(maxsize=1)

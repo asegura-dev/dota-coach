@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from dota_coach.analyzer import EventDetector
-from dota_coach.events import EventType
+from dota_coach.detection.analyzer import EventDetector
+from dota_coach.detection.events import EventType
 
 
 def _state(

@@ -4,7 +4,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-_HEROES_PATH = Path(__file__).resolve().parents[2] / "data" / "heroes.json"
+_HEROES_PATH = Path(__file__).resolve().parents[3] / "data" / "heroes.json"
 
 _HERO_PREFIX = "npc_dota_hero_"
 

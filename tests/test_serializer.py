@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from dota_coach.serializer import serialize
+from dota_coach.gamedata.serializer import serialize
 
 
 def _base_payload() -> dict[str, Any]:

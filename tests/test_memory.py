@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from dota_coach.memory import AdviceMemory
+from dota_coach.mind.memory import AdviceMemory
 
 # Display map used across tests: internal name -> display name.
 _NAMES = {

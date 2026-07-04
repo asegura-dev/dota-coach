@@ -10,9 +10,9 @@ import threading
 from typing import Any
 
 from dota_coach import console
-from dota_coach.brain import Brain
-from dota_coach.events import Event
-from dota_coach.tts import Speaker
+from dota_coach.detection.events import Event
+from dota_coach.mind.brain import Brain
+from dota_coach.voice.tts import Speaker
 
 
 class AdviceWorker:

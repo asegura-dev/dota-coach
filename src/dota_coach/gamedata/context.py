@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "context.json"
+_CONTEXT_PATH = Path(__file__).resolve().parents[3] / "context.json"
 
 
 def load_context() -> dict[str, Any]:

@@ -16,7 +16,7 @@ from typing import Any
 
 import customtkinter as ctk
 
-from dota_coach.heroes_list import hero_name_map
+from dota_coach.gamedata.heroes_list import hero_name_map
 
 _CONTEXT_PATH = Path(__file__).resolve().parents[2] / "context.json"
 _ROLES = ["carry", "mid", "offlane", "support"]

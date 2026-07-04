@@ -7,7 +7,7 @@ It does not decide what to say; it only reports what changed.
 
 from typing import Any
 
-from dota_coach.events import Event, EventType
+from dota_coach.detection.events import Event, EventType
 
 # Thresholds (tunable).
 _LOW_HEALTH_PERCENT = 20

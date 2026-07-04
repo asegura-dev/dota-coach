@@ -5,7 +5,7 @@ import time
 
 from dota_coach import console
 from dota_coach.config import Config
-from dota_coach.server import create_app
+from dota_coach.interface.server import create_app
 
 _HEARTBEAT_SECONDS = 60.0
 

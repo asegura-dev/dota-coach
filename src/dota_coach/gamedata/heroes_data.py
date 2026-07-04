@@ -11,7 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-_DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+_DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 _HERO_ABILITIES_PATH = _DATA_DIR / "hero_abilities.json"
 _ABILITIES_PATH = _DATA_DIR / "abilities.json"
 

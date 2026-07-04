@@ -6,11 +6,11 @@ from typing import Any
 from flask import Flask, request
 
 from dota_coach import console
-from dota_coach.analyzer import EventDetector
-from dota_coach.brain import Brain
 from dota_coach.config import Config
-from dota_coach.serializer import serialize
-from dota_coach.worker import AdviceWorker
+from dota_coach.detection.analyzer import EventDetector
+from dota_coach.gamedata.serializer import serialize
+from dota_coach.interface.worker import AdviceWorker
+from dota_coach.mind.brain import Brain
 
 # Silence Werkzeug's per-request logging; we print our own clean output.
 logging.getLogger("werkzeug").setLevel(logging.ERROR)

@@ -10,11 +10,11 @@ from typing import Any
 import ollama
 
 from dota_coach import console
-from dota_coach.context import load_context
-from dota_coach.events import Event, EventType
-from dota_coach.heroes_data import lookup_hero
-from dota_coach.items_data import item_name_map, lookup_many
-from dota_coach.memory import AdviceMemory
+from dota_coach.detection.events import Event, EventType
+from dota_coach.gamedata.context import load_context
+from dota_coach.gamedata.heroes_data import lookup_hero
+from dota_coach.gamedata.items_data import item_name_map, lookup_many
+from dota_coach.mind.memory import AdviceMemory
 
 # The coach's persona and hard rules, shared by every request.
 _SYSTEM_PROMPT = (
