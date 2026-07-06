@@ -1,4 +1,4 @@
-"""A CustomTkinter window to set the match context (role and draft).
+﻿"""A CustomTkinter window to set the match context (role and draft).
 
 Runs as a separate program from the coach. It writes context.json, which the
 coach reads when building advice. The two stay decoupled: the GUI only writes
@@ -18,11 +18,24 @@ import customtkinter as ctk
 
 from dota_coach.gamedata.heroes_list import hero_name_map
 
-_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "context.json"
+_CONTEXT_PATH = Path(__file__).resolve().parents[3] / "context.json"
 _ROLES = ["carry", "mid", "offlane", "support"]
 _MAX_ENEMIES = 5
 _MAX_ALLIES = 4
 _MAX_RESULTS = 5  # how many filtered heroes to show at once
+# Voice-toggle events: internal name (matches EventType.value) -> label shown.
+_VOICE_EVENTS = [
+    ("low_health", "Low health"),
+    ("low_mana", "Low mana"),
+    ("hero_died", "You died"),
+    ("hero_kill", "You killed"),
+    ("leveled_up", "Leveled up"),
+    ("high_unspent_gold", "Unspent gold"),
+    ("scouting_reminder", "Scout the map"),
+    ("match_started", "Match started"),
+    ("strategy_time", "Strategy time"),
+    ("starting_items_check", "Starting items"),
+]
 
 
 def _load_existing() -> dict[str, Any]:
@@ -38,8 +51,8 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
 
     def __init__(self) -> None:
         super().__init__()
-        self.title("Dota Coach — Contexto")
-        self.geometry("460x760")
+        self.title("Dota Coach - Context")
+        self.geometry("460x1200")
 
         self._heroes = hero_name_map()
         self._reverse = {v: k for k, v in self._heroes.items()}
@@ -50,14 +63,14 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
         existing = _load_existing()
 
         # --- Save button: anchored to the bottom first, always visible ---
-        ctk.CTkButton(self, text="Guardar", command=self._save).pack(
+        ctk.CTkButton(self, text="Save", command=self._save).pack(
             side="bottom", padx=20, pady=(6, 12), fill="x"
         )
         self._status = ctk.CTkLabel(self, text="")
         self._status.pack(side="bottom", pady=(4, 0))
 
         # --- Role: fixed on top ---------------------------------------
-        ctk.CTkLabel(self, text="Tu rol", anchor="w").pack(
+        ctk.CTkLabel(self, text="Your role", anchor="w").pack(
             side="top", fill="x", padx=20, pady=(20, 4)
         )
         self._role = ctk.CTkComboBox(self, values=_ROLES)
@@ -65,10 +78,10 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
         self._role.pack(side="top", fill="x", padx=20)
 
         # --- Search box -----------------------------------------------
-        ctk.CTkLabel(self, text="Buscar heroe", anchor="w").pack(
+        ctk.CTkLabel(self, text="Search hero", anchor="w").pack(
             side="top", fill="x", padx=20, pady=(16, 4)
         )
-        self._search = ctk.CTkEntry(self, placeholder_text="escribe: phantom...")
+        self._search = ctk.CTkEntry(self, placeholder_text="type: phantom...")
         self._search.pack(side="top", fill="x", padx=20)
         self._search.bind("<KeyRelease>", self._on_search)
 
@@ -88,13 +101,26 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
         self._ally_frame.pack(side="top", fill="x", padx=20)
 
         # Pre-fill teams from an existing context, then draw everything.
-        for name in existing.get("enemies", [])[:_MAX_ENEMIES]:
-            if name in self._reverse:
-                self._enemies.append(name)
         for name in existing.get("allies", [])[:_MAX_ALLIES]:
             if name in self._reverse:
                 self._allies.append(name)
         self._render_teams()
+
+        # --- Voice toggles: which events are spoken -------------------
+        ctk.CTkLabel(self, text="Spoken events", anchor="w").pack(
+            side="top", fill="x", padx=20, pady=(14, 4)
+        )
+        voice_frame = ctk.CTkFrame(self, fg_color="transparent")
+        voice_frame.pack(side="top", fill="x", padx=20)
+        saved_voice = existing.get("voice", {})
+        self._voice_vars: dict[str, Any] = {}
+        for index, (name, label) in enumerate(_VOICE_EVENTS):
+            var = ctk.BooleanVar(value=bool(saved_voice.get(name, True)))
+            self._voice_vars[name] = var
+            ctk.CTkCheckBox(voice_frame, text=label, variable=var).grid(
+                row=index // 2, column=index % 2, sticky="w", padx=4, pady=3
+            )
+
 
     # -- Search ---------------------------------------------------------
     def _on_search(self, _event: Any = None) -> None:
@@ -116,11 +142,11 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
             side="left", fill="x", expand=True
         )
         ctk.CTkButton(
-            row, text="→ Enemigo", width=90,
+            row, text="-> Enemy", width=90,
             command=lambda d=display: self._add(d, "enemy"),
         ).pack(side="left", padx=2)
         ctk.CTkButton(
-            row, text="→ Aliado", width=90,
+            row, text="-> Ally", width=90,
             command=lambda d=display: self._add(d, "ally"),
         ).pack(side="left", padx=2)
 
@@ -131,16 +157,16 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
         if internal is None:
             return
         if internal in self._enemies or internal in self._allies:
-            self._status.configure(text=f"{display} ya esta en un equipo")
+            self._status.configure(text=f"{display} is already on a team")
             return
         if team == "enemy":
             if len(self._enemies) >= _MAX_ENEMIES:
-                self._status.configure(text="Ya tienes 5 enemigos")
+                self._status.configure(text="You already have 5 enemies")
                 return
             self._enemies.append(internal)
         else:
             if len(self._allies) >= _MAX_ALLIES:
-                self._status.configure(text="Ya tienes 4 aliados")
+                self._status.configure(text="You already have 4 allies")
                 return
             self._allies.append(internal)
         self._status.configure(text="")
@@ -156,10 +182,10 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
     def _render_teams(self) -> None:
         """Redraw team chip rows and their counters."""
         self._enemy_label.configure(
-            text=f"Enemigos ({len(self._enemies)}/{_MAX_ENEMIES})"
+            text=f"Enemies ({len(self._enemies)}/{_MAX_ENEMIES})"
         )
         self._ally_label.configure(
-            text=f"Aliados ({len(self._allies)}/{_MAX_ALLIES})"
+            text=f"Allies ({len(self._allies)}/{_MAX_ALLIES})"
         )
         self._render_chips(self._enemy_frame, self._enemies, "enemy")
         self._render_chips(self._ally_frame, self._allies, "ally")
@@ -178,7 +204,7 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
                 side="left", fill="x", expand=True, padx=6
             )
             ctk.CTkButton(
-                chip, text="✕", width=28,
+                chip, text="x", width=28,
                 command=lambda n=internal: self._remove(n, team),
             ).pack(side="right", padx=4)
 
@@ -189,11 +215,14 @@ class ContextApp(ctk.CTk):  # type: ignore[misc]
             "role": self._role.get().strip(),
             "allies": self._allies,
             "enemies": self._enemies,
+            "voice": {
+                name: var.get() for name, var in self._voice_vars.items()
+            },
         }
         _CONTEXT_PATH.write_text(
             json.dumps(context, ensure_ascii=False, indent=2), encoding="utf-8"
         )
-        self._status.configure(text="Guardado ✓")
+        self._status.configure(text="Saved")
 
 
 def main() -> None:
