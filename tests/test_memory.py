@@ -73,3 +73,24 @@ def test_expired_entry_is_dropped() -> None:
     later = _state(abilities=[{"name": "maledict", "level": 3}])
     # With a zero TTL the entry has already expired, so nothing is reported.
     assert memory.fulfilled(later, _NAMES) == []
+
+
+def test_recently_advised_includes_fresh_entry() -> None:
+    memory = AdviceMemory()
+    state = _state(abilities=[{"name": "maledict", "level": 2}])
+    memory.record("Level up Maledict.", state, _NAMES)
+    # Just advised, so it counts as recent within the cooldown.
+    assert memory.recently_advised(cooldown=60.0) == ["Maledict"]
+
+
+def test_recently_advised_excludes_with_zero_cooldown() -> None:
+    memory = AdviceMemory()
+    state = _state(abilities=[{"name": "maledict", "level": 2}])
+    memory.record("Level up Maledict.", state, _NAMES)
+    # Nothing is "more recent than zero seconds", so the list is empty.
+    assert memory.recently_advised(cooldown=0.0) == []
+
+
+def test_recently_advised_empty_when_nothing_recorded() -> None:
+    memory = AdviceMemory()
+    assert memory.recently_advised(cooldown=60.0) == []

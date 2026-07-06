@@ -76,3 +76,18 @@ class AdviceMemory:
                     done.append(name)
                     self._advised.pop(name, None)
         return done
+    
+
+    def recently_advised(self, cooldown: float = 60.0) -> list[str]:
+        """Return entities advised within the last `cooldown` seconds.
+
+        These were mentioned so recently that repeating them would be spam,
+        whether or not the player has acted on them yet. The caller uses this
+        to tell the model not to bring them up again for now.
+        """
+        now = time.monotonic()
+        return [
+            name
+            for name, (_kind, _marker, ts) in self._advised.items()
+            if now - ts < cooldown
+        ]

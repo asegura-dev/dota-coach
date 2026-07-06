@@ -190,6 +190,15 @@ class Brain:
             else ""
         )
 
+        # Advice given very recently: do not repeat it yet, acted on or not.
+        recent = self._memory.recently_advised(60.0)
+        recent_line = (
+            f"You mentioned these in the last minute; do not bring them up "
+            f"again yet: {', '.join(recent)}.\n"
+            if recent
+            else ""
+        )
+
         return (
             f"{instruction}\n\n"
             f"Current player state (JSON): {state_json}\n"
@@ -205,6 +214,7 @@ class Brain:
             f"enemies; GSI does not provide this): {context_json}\n"
             f"Event data: {extra}\n\n"
             f"{acted_line}"
+            f"{recent_line}"
             f"The player ALREADY has the items listed above; do not recommend "
             f"them again. For abilities and talents use ONLY the real names "
             f"listed above, never invent. Reply in English."
