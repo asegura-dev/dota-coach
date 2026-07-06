@@ -11,6 +11,7 @@ from typing import Any
 
 from dota_coach import console
 from dota_coach.detection.events import Event
+from dota_coach.gamedata.context import load_context, should_speak
 from dota_coach.mind.brain import Brain
 from dota_coach.voice.tts import Speaker
 
@@ -39,5 +40,7 @@ class AdviceWorker:
             advice = self._brain.advise(event, state)
             if advice:
                 console.advice(event.type.value, advice)
-                self._speaker.say(advice)
+                voice_prefs = load_context().get("voice", {})
+                if should_speak(voice_prefs, event.type.value):
+                    self._speaker.say(advice)
             self._queue.task_done()
