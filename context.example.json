@@ -1,5 +1,17 @@
 {
   "role": "hard support",
   "allies": ["furion", "mars"],
-  "enemies": ["axe", "lion", "juggernaut", "crystal_maiden", "pudge"]
+  "enemies": ["axe", "lion", "juggernaut", "crystal_maiden", "pudge"],
+  "voice": {
+    "low_health": true,
+    "low_mana": true,
+    "hero_died": true,
+    "hero_kill": true,
+    "leveled_up": true,
+    "high_unspent_gold": true,
+    "scouting_reminder": true,
+    "match_started": true,
+    "starting_items_check": true,
+    "strategy_time": true
+  }
 }
