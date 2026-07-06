@@ -13,7 +13,7 @@ from pathlib import Path
 import sounddevice as sd
 from piper import PiperVoice, SynthesisConfig
 
-_VOICE_PATH = Path(__file__).resolve().parents[2] / "voices" / "en_US-lessac-high.onnx"
+_VOICE_PATH = Path(__file__).resolve().parents[3] / "voices" / "en_US-lessac-high.onnx"
 
 
 class Speaker:
