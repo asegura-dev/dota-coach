@@ -21,16 +21,26 @@ def load_context() -> dict[str, Any]:
     try:
         raw = _CONTEXT_PATH.read_text(encoding="utf-8")
     except FileNotFoundError:
-        return {"role": "", "allies": [], "enemies": []}
+        return {"role": "", "allies": [], "enemies": [], "voice": {}}
 
     try:
         data: dict[str, Any] = json.loads(raw)
     except json.JSONDecodeError:
         # A half-written file (being edited) should not crash the coach.
-        return {"role": "", "allies": [], "enemies": []}
+        return {"role": "", "allies": [], "enemies": [], "voice": {}}
 
     return {
         "role": data.get("role", ""),
         "allies": data.get("allies", []),
         "enemies": data.get("enemies", []),
+        "voice": data.get("voice", {}),
     }
+
+
+def should_speak(voice_prefs: dict[str, Any], event_type: str) -> bool:
+    """Whether an event's advice should be spoken.
+
+    Default is to speak everything: an event is silent only if the player
+    explicitly set it to false. Missing keys count as enabled.
+    """
+    return bool(voice_prefs.get(event_type, True))
